@@ -27,6 +27,7 @@ export default class GraphPersona extends React.Component<IGraphPersonaProps, IG
   }
 
   public render(): React.ReactElement<IGraphPersonaProps> {
+    
     return (
       <Persona primaryText={this.state.name}
               secondaryText={this.state.email}
