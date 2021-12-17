@@ -4,6 +4,7 @@ import { IGraphPersonaProps } from './IGraphPersonaProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import { IGraphPersonaState } from './IGraphPersonaState';
 
+import AdaptiveCard from "react-adaptivecards";
 import { MSGraphClient } from '@microsoft/sp-http';
 import * as MicrosoftGraph from '@microsoft/microsoft-graph-types';
 
@@ -22,6 +23,7 @@ export default class GraphPersona extends React.Component<IGraphPersonaProps, IG
       name: '',
       email: '',
       phone: '',
+      id: '',
       image: null
     };
   }
@@ -29,13 +31,58 @@ export default class GraphPersona extends React.Component<IGraphPersonaProps, IG
   public render(): React.ReactElement<IGraphPersonaProps> {
     
     return (
-      <Persona primaryText={this.state.name}
-              secondaryText={this.state.email}
-              onRenderSecondaryText={this._renderMail}
-              tertiaryText={this.state.phone}
-              onRenderTertiaryText={this._renderPhone}
-              imageUrl={this.state.image}
-              size={PersonaSize.size100} />
+      <div>
+        {/*<Persona primaryText={this.state.name}
+                secondaryText={this.state.email}
+                onRenderSecondaryText={this._renderMail}
+                tertiaryText={this.state.phone}
+                onRenderTertiaryText={this._renderPhone}
+                optionalText={this.state.id}
+                //onRenderOptionalText={this._renderID}
+                imageUrl={this.state.image}
+                size={PersonaSize.size100} />
+    */}
+        <AdaptiveCard
+              payload={{
+                $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+                type: "AdaptiveCard",
+                version: "1.0",
+                body: [
+                  {
+                    type: "Container",
+                    items: [
+                      {
+                        type: "Image",
+                        horizontalAlignment: "Left",
+                        spacing: "Large",
+                        style: "Person",
+                        url: `${
+                          this.state.image
+                            ? this.state.image
+                            : "http://www.sharepointpals.com/image.axd?picture=/avatars/Authors/ahamed-fazil-buhari.png"
+                        }`,
+                        size: "Medium"
+                      },
+                      {
+                        type: "TextBlock",
+                        size: "Large",
+                        horizontalAlignment: "Center",
+                        weight: "Normal",
+                        text: `${this.state.name}`
+                      },
+                      {
+                        type: "TextBlock",
+                        horizontalAlignment: "Center",
+                        weight: "Bolder",
+                        text: `${this.state.email}`,
+                        wrap: true
+                      }
+                    ]
+                  }
+                ]
+              }}
+            />  
+      </div>            
     );
   }
 
@@ -54,7 +101,15 @@ export default class GraphPersona extends React.Component<IGraphPersonaProps, IG
       return <div />;
     }
   }
-  
+
+  private _renderID = () => {
+    if (this.state.id) {
+      return <Link href={`id:${this.state.id}`}>{this.state.id}</Link>;
+    } else {
+      return <div />;
+    }
+  }  
+
   public componentDidMount(): void {
     this.props.graphClient
       .api('me')
@@ -62,6 +117,7 @@ export default class GraphPersona extends React.Component<IGraphPersonaProps, IG
         this.setState({
           name: user.displayName,
           email: user.mail,
+          id: user.id,
           phone: user.businessPhones[0]
         });
       });
